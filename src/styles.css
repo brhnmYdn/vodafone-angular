@@ -82,6 +82,8 @@ body {
   cursor: default;
   overflow: hidden;
 }
+
+
 .todoList button {
   width: 70px;
   height: 45px;
@@ -97,3 +99,6 @@ body {
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -5,13 +5,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {NgxsReduxDevtoolsPluginModule} from "@ngxs/devtools-plugin";
 import {NgxsModule} from "@ngxs/store";
-import {NgxsLoggerPluginModule} from "@ngxs/logger-plugin";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatCheckboxModule} from "@angular/material/checkbox";
-import {MatInputModule} from "@angular/material/input";
 import { TodolistLayoutComponent } from './vodafone/layout/todolist-layout/todolist-layout.component';
+import {TodolistState} from "./vodafone/store/state/todolist.state";
+import {HttpClientModule} from "@angular/common/http";
 
-export const STATE_MODULES = []
+export const STATE_MODULES = [
+  TodolistState
+]
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,7 +23,7 @@ export const STATE_MODULES = []
     AppRoutingModule,
     NgxsModule.forRoot(STATE_MODULES),
     NgxsReduxDevtoolsPluginModule.forRoot(),
-    NgxsLoggerPluginModule.forRoot(),
+    HttpClientModule,
     BrowserAnimationsModule,
   ],
   providers: [],

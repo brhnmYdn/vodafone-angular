@@ -48,10 +48,11 @@ body {
 .addField input:focus {
   border-color: #49e8e3;
 }
-.addField button {
+.addField input[type=button] {
+  display: flex;
   width: 70px;
   height: 100%;
-  border: none;
+  border: none  ;
   color: #fff;
   margin-left: 5px;
   font-size: 21px;
@@ -60,8 +61,6 @@ body {
   cursor: pointer;
   border-radius: 3px;
   opacity: 0.6;
-  pointer-events: none;
-  transition: all 0.3s ease;
 }
 
 .wrapper .todoList {
@@ -96,7 +95,6 @@ body {
   cursor: pointer;
   border-radius: 3px;
   opacity: 0.6;
-  pointer-events: none;
   transition: all 0.3s ease;
 }
 

@@ -22,6 +22,6 @@
       [checked]="item.checked"
       (change)="check($event, item)"
     />
-    {{ item.jobDescription }}</ng-template
+    {{ item.jobDescription | titlecase }}</ng-template
   >
 </div>

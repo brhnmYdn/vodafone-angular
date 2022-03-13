@@ -58,7 +58,7 @@ export class TodolistComponent implements OnInit, OnDestroy {
     const jobDescription = this.todoForm.get('jobDescription')?.value;
     const findTodo = this.todoList.find(
       (item: Todolist.TodoResponse) =>
-        item.jobDescription.toUpperCase() === jobDescription.toUpperCase()
+        item.jobDescription?.toUpperCase() === jobDescription?.toUpperCase()
     );
     if (findTodo)
       this.modalService.openModalWithComponent(
@@ -68,7 +68,9 @@ export class TodolistComponent implements OnInit, OnDestroy {
 
     if (!findTodo && this.todoForm.valid) {
       this.store.dispatch(new CreateTodoAction(jobDescription));
-      this.store.dispatch(new GetTodoList());
+      setTimeout(() => {
+        this.store.dispatch(new GetTodoList());
+      }, 100);
       this.todoForm.reset();
     }
   }

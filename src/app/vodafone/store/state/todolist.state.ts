@@ -4,13 +4,13 @@ import { Todolist } from '../model/todolist';
 import { TODOLIST_DEFAULT } from '../default/todolist.default';
 import { TodolistService } from '../service/todolist.service';
 import {
+  CheckedTodo,
   CreateTodoAction,
   DeleteTodo,
   GetTodoList,
 } from '../action/todolist.action';
 import { tap } from 'rxjs';
-import CreateTodoResponse = Todolist.CreateTodoResponse;
-import DeleteResponse = Todolist.DeleteResponse;
+import { ModalService } from '../../shared/services/modal.service';
 
 @State<Todolist.State>({
   name: 'TodolistState',
@@ -18,11 +18,19 @@ import DeleteResponse = Todolist.DeleteResponse;
 })
 @Injectable()
 export class TodolistState {
-  constructor(private todoListService: TodolistService) {}
+  constructor(
+    private todoListService: TodolistService,
+    private modalService: ModalService
+  ) {}
 
   @Selector()
   static getTodoList({ todoListResponse }: Todolist.State) {
     return todoListResponse;
+  }
+
+  @Selector()
+  static getUpdated({ updatedResponse }: Todolist.State) {
+    return updatedResponse;
   }
 
   @Selector()
@@ -35,13 +43,17 @@ export class TodolistState {
     { patchState }: StateContext<Todolist.State>,
     { payload }: CreateTodoAction
   ) {
-    return this.todoListService
-      .createTodo(payload)
-      .pipe(
-        tap((response: CreateTodoResponse) =>
-          patchState({ createTodoResponse: response })
-        )
-      );
+    return this.todoListService.createTodo(payload).pipe(
+      tap((response: Todolist.TodoResponse) =>
+        patchState({ createTodoResponse: response })
+      ),
+      tap(() => {
+        this.modalService.openModalWithComponent(
+          'Başarılı',
+          'modal-body alert-success'
+        );
+      })
+    );
   }
 
   @Action(GetTodoList)
@@ -49,7 +61,7 @@ export class TodolistState {
     return this.todoListService
       .getTodoList()
       .pipe(
-        tap((response: CreateTodoResponse[]) =>
+        tap((response: Todolist.TodoResponse[]) =>
           patchState({ todoListResponse: response })
         )
       );
@@ -63,5 +75,19 @@ export class TodolistState {
     return this.todoListService
       .deleteTodo(payload)
       .pipe(tap(() => patchState({ deletedId: payload })));
+  }
+
+  @Action(CheckedTodo)
+  checkedTodo(
+    { patchState }: StateContext<Todolist.State>,
+    { payload }: CheckedTodo
+  ) {
+    return this.todoListService
+      .checkedTodo(payload)
+      .pipe(
+        tap((response: Todolist.TodoResponse) =>
+          patchState({ updatedResponse: response })
+        )
+      );
   }
 }

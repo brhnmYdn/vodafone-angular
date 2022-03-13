@@ -1,0 +1,10 @@
+<div [ngClass]="modalClass">
+  <div>
+    <strong>{{ modalMessage }}!</strong>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" (click)="bsModalRef.hide()">
+    {{ closeBtnName }}
+  </button>
+</div>

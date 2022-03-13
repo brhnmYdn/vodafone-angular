@@ -8,21 +8,20 @@
     <input type="button" (click)="createTodo()" value="Add" />
   </div>
 </form>
-<div class="todoList" *ngFor="let item of todoList">
+<div class="todoList" *ngFor="let item of todoList$ | async">
   <li *ngIf="item.checked" [ngStyle]="extraStyle">
     <ng-container *ngTemplateOutlet="checked"></ng-container>
   </li>
   <li *ngIf="!item.checked">
     <ng-container *ngTemplateOutlet="checked"></ng-container>
   </li>
-
-  <button class="fa fa-trash" (click)="delete(item.todo.id)"></button>
+  <button class="fa fa-trash" (click)="delete(item.id)"></button>
   <ng-template #checked>
     <input
       type="checkbox"
       [checked]="item.checked"
       (change)="check($event, item)"
     />
-    {{ item.todo.jobDescription }}</ng-template
+    {{ item.jobDescription }}</ng-template
   >
 </div>

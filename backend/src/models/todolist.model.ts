@@ -14,6 +14,11 @@ export class Todolist extends Entity {
   })
   jobDescription?: string;
 
+  @property({
+    type: 'boolean',
+  })
+  checked?: boolean;
+
   // Define well-known properties here
 
   // Indexer property to allow additional data

@@ -1,23 +1,16 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import {
+  CheckedTodo,
   CreateTodoAction,
-  DeleteTodo,
   GetTodoList,
 } from '../../../store/action/todolist.action';
 import { TodolistState } from '../../../store/state/todolist.state';
 import { Observable, Subscription } from 'rxjs';
 import { Todolist } from '../../../store/model/todolist';
 import { TodoService } from '../services/todo.service';
-import { Ecommon } from '../../../core/ecommon';
-import MappingTodolist = Ecommon.MappingTodolist;
+import { ModalService } from '../../../shared/services/modal.service';
 
 @Component({
   selector: 'vodafone-todolist',
@@ -25,30 +18,30 @@ import MappingTodolist = Ecommon.MappingTodolist;
 })
 export class TodolistComponent implements OnInit, OnDestroy {
   @Select(TodolistState.getTodoList)
-  todoList$!: Observable<Todolist.CreateTodoResponse[]>;
+  todoList$!: Observable<Todolist.TodoResponse[]>;
 
   @Select(TodolistState.getDeletedResponse)
   deletedResponse$!: Observable<string>;
 
-  todoList: Ecommon.MappingTodolist[] = [];
+  todoList: Todolist.TodoResponse[] = [];
   todoForm: FormGroup = this.todoService.getTodoForm();
   extraStyle = { 'text-decoration-line': 'line-through' };
-  selectedIdlist: number[] = [];
   _subscriptions: Subscription[] = [];
 
   constructor(
     private store: Store,
     private todoService: TodoService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
     const subscription = this.todoList$.subscribe(
-      (item: Todolist.CreateTodoResponse[]) => {
+      (item: Todolist.TodoResponse[]) => {
         this.todoList = [];
 
-        item.forEach((todo: Todolist.CreateTodoResponse) => {
-          this.todoList.push({ todo: todo, checked: false });
+        item.forEach((todo: Todolist.TodoResponse) => {
+          this.todoList.push(todo);
           this.cd.detectChanges();
         });
       }
@@ -63,22 +56,37 @@ export class TodolistComponent implements OnInit, OnDestroy {
 
   createTodo() {
     const jobDescription = this.todoForm.get('jobDescription')?.value;
-    if (this.todoForm.valid) {
+    const findTodo = this.todoList.find(
+      (item: Todolist.TodoResponse) =>
+        item.jobDescription.toUpperCase() === jobDescription.toUpperCase()
+    );
+    if (findTodo)
+      this.modalService.openModalWithComponent(
+        'Böyle Bir çalışma hali hazırda var',
+        'modal-body alert-danger'
+      );
+
+    if (!findTodo && this.todoForm.valid) {
       this.store.dispatch(new CreateTodoAction(jobDescription));
       this.store.dispatch(new GetTodoList());
+      this.todoForm.reset();
     }
-    this.todoForm.reset();
   }
 
   delete(id: number) {
-    this.store.dispatch(new DeleteTodo(id));
+    this.todoService.delete(id);
   }
 
-  check(event: any, mappingTodolist: MappingTodolist) {
-    this.todoList.forEach((item: MappingTodolist) => {
-      if (item.todo.id === mappingTodolist.todo.id)
-        item.checked = event.srcElement.checked;
-    });
+  check(event: any, todo: Todolist.TodoResponse) {
+    const request: Todolist.TodoPutRequest = {
+      id: todo.id,
+      jobDescription: todo.jobDescription,
+      checked: event.srcElement.checked,
+    };
+    this.store.dispatch(new CheckedTodo(request));
+    setTimeout(() => {
+      this.store.dispatch(new GetTodoList());
+    }, 100);
   }
 
   ngOnDestroy(): void {

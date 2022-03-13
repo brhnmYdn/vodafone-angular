@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
 import { Todolist } from '../model/todolist';
-import DeleteResponse = Todolist.DeleteResponse;
 
 @Injectable({
   providedIn: 'root',
@@ -11,16 +10,25 @@ import DeleteResponse = Todolist.DeleteResponse;
 export class TodolistService {
   constructor(private http: HttpClient) {}
 
-  createTodo(jobDescription: string): Observable<Todolist.CreateTodoResponse> {
-    const request = { jobDescription: jobDescription };
-    return this.http.post<Todolist.CreateTodoResponse>(
+  createTodo(jobDescription: string): Observable<Todolist.TodoResponse> {
+    const request = { jobDescription: jobDescription, checked: false };
+    return this.http.post<Todolist.TodoResponse>(
       environment.url + 'todolists',
       request
     );
   }
 
-  getTodoList(): Observable<Todolist.CreateTodoResponse[]> {
-    return this.http.get<Todolist.CreateTodoResponse[]>(
+  checkedTodo(
+    todoRequest: Todolist.TodoPutRequest
+  ): Observable<Todolist.TodoResponse> {
+    return this.http.put<Todolist.TodoResponse>(
+      environment.url + 'todolists/' + todoRequest.id,
+      todoRequest
+    );
+  }
+
+  getTodoList(): Observable<Todolist.TodoResponse[]> {
+    return this.http.get<Todolist.TodoResponse[]>(
       environment.url + 'todolists'
     );
   }
